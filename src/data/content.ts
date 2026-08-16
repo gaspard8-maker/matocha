@@ -16,12 +16,15 @@ export const marqueeItems = [
 /** Why sticks — each benefit gets a state of the same glass. */
 export const stickBenefits: {
   glass: GlassVariant;
+  /** Short category shown above the heading — must not repeat the title. */
+  kicker: string;
   title: string;
   body: string;
   detail: string;
 }[] = [
   {
     glass: "classic",
+    kicker: "The dose",
     title: "Perfectly portioned",
     body: "2g in every stick.",
     detail:
@@ -29,6 +32,7 @@ export const stickBenefits: {
   },
   {
     glass: "whisked",
+    kicker: "Freshness",
     title: "Fresh by design",
     body: "Each serving stays sealed until you open it.",
     detail:
@@ -36,6 +40,7 @@ export const stickBenefits: {
   },
   {
     glass: "ice",
+    kicker: "Portability",
     title: "Goes anywhere",
     body: "Desk. Bag. Hotel. Train. Repeat.",
     detail:

@@ -47,7 +47,9 @@ export function BigTwoG() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={viewportOnce}
             transition={{ duration: 0.9, delay: 0.15, ease: EASE }}
-            className="absolute inset-x-0 bottom-[-6%] flex items-end justify-center gap-6 sm:gap-10"
+            /* On a phone the product sits under the numeral instead of on top
+               of it — overlapping at 390px hid most of the 2G. */
+            className="relative mt-4 flex items-end justify-center gap-6 sm:absolute sm:inset-x-0 sm:bottom-[-6%] sm:mt-0 sm:gap-10"
           >
             <div className="h-[9rem] rotate-[-7deg] drop-shadow-xl sm:h-[13rem] lg:h-[16rem]">
               <ProductStick tone="green" glass="classic" />
@@ -65,7 +67,7 @@ export function BigTwoG() {
           whileInView={{ opacity: 1 }}
           viewport={viewportOnce}
           transition={{ duration: 0.8, delay: 0.3, ease: EASE }}
-          className="mt-16 flex flex-wrap justify-center gap-x-10 gap-y-2 border-t border-black/20 pt-6 sm:mt-24"
+          className="mt-8 flex flex-wrap justify-center gap-x-10 gap-y-2 border-t border-black/20 pt-6 sm:mt-24"
         >
           {["No scoop.", "No scale.", "No guessing."].map((line) => (
             <li key={line} className="text-h3 u-caps">

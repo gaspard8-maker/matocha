@@ -54,7 +54,7 @@ export function WhatsInTheBox() {
             transition={{ duration: 1, ease: EASE }}
             className="absolute inset-x-0 top-0 opacity-30"
           >
-            <StickTray columns={30} tone="ivory" />
+            <StickTray columns={30} mobileColumns={15} tone="ivory" />
           </motion.div>
 
           <div className="relative grid items-end gap-6 sm:grid-cols-12">

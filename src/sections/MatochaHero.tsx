@@ -67,7 +67,7 @@ export function MatochaHero() {
             {brand.servingUnit.toUpperCase()}
           </span>
           <MicroMark>100% Japanese matcha</MicroMark>
-          <MicroMark>No sugar</MicroMark>
+          <MicroMark className="hidden sm:inline">No sugar</MicroMark>
           <MicroMark className="hidden sm:inline">No additives</MicroMark>
           <MicroMark className="ml-auto hidden lg:inline">
             {brand.netWeight}
@@ -140,7 +140,7 @@ export function MatochaHero() {
               initial={{ opacity: 0, y: 36 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.8, ease: EASE }}
-              className="absolute bottom-[2%] left-0 w-[54%]"
+              className="absolute bottom-[2%] left-0 w-[48%] sm:w-[54%]"
             >
               <ProductBox className="w-full" />
             </motion.div>
@@ -150,12 +150,17 @@ export function MatochaHero() {
               initial={{ opacity: 0, y: 46 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.9, ease: EASE }}
-              className="absolute bottom-[-2%] left-[40%] flex h-full w-[46%] items-end gap-[5%]"
+              className="absolute bottom-[-2%] left-[46%] flex h-full w-[38%] items-end gap-[6%] sm:left-[40%] sm:w-[46%]"
             >
               {(["classic", "ice", "whisked"] as const).map((glass, index) => (
                 <div
                   key={glass}
-                  className="drop-shadow-[0_16px_26px_rgba(22,23,19,0.22)]"
+                  /* The third stick only appears once there is room for it. */
+                  className={
+                    index === 2
+                      ? "hidden drop-shadow-[0_16px_26px_rgba(22,23,19,0.22)] sm:block"
+                      : "drop-shadow-[0_16px_26px_rgba(22,23,19,0.22)]"
+                  }
                   style={{
                     transform: `rotate(${[-8, 3, 9][index]}deg)`,
                     height: ["72%", "62%", "54%"][index],

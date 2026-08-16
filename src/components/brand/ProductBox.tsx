@@ -1,3 +1,6 @@
+"use client";
+
+import { useId } from "react";
 import { brand } from "@/data/brand";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +21,14 @@ export function ProductBox({
   className?: string;
   open?: boolean;
 }) {
+  /* Unique per instance. With fixed ids, the first definition in the document
+     wins — and if that instance sits in a display:none column, the filter and
+     gradient references break and the box vanishes. */
+  const uid = useId().replace(/:/g, "");
+  const faceId = `box-face-${uid}`;
+  const shadowId = `box-shadow-${uid}`;
+  const clipId = `box-glass-${uid}`;
+
   const green = brand.colors.green;
   const deep = brand.colors.greenDeep;
   const ivory = brand.colors.ivory;
@@ -37,12 +48,12 @@ export function ProductBox({
       aria-label={`${brand.productName} — ${brand.sticksPerBox} sticks of ${brand.servingWeight}${brand.servingUnit}`}
     >
       <defs>
-        <linearGradient id="box-face" x1="0" y1="0" x2="1" y2="0.25">
+        <linearGradient id={faceId} x1="0" y1="0" x2="1" y2="0.25">
           <stop offset="0%" stopColor="#1C4A34" />
           <stop offset="58%" stopColor={green} />
           <stop offset="100%" stopColor={deep} />
         </linearGradient>
-        <filter id="box-shadow" x="-30%" y="-10%" width="160%" height="140%">
+        <filter id={shadowId} x="-30%" y="-10%" width="160%" height="140%">
           <feDropShadow
             dx="0"
             dy="26"
@@ -51,7 +62,7 @@ export function ProductBox({
             floodOpacity="0.3"
           />
         </filter>
-        <clipPath id="box-glass-inside">
+        <clipPath id={clipId}>
           <path d={interior} transform="translate(226 330)" />
         </clipPath>
       </defs>
@@ -78,16 +89,16 @@ export function ProductBox({
         </g>
       )}
 
-      <g filter="url(#box-shadow)">
+      <g filter={`url(#${shadowId})`}>
         {/* Lid plane */}
         <path d="M62 150 L390 150 L436 106 L108 106 Z" fill="#1C4A34" />
         {/* Right side */}
         <path d="M390 150 L436 106 L436 484 L390 528 Z" fill={deep} />
         {/* Front face */}
-        <path d="M62 150 L390 150 L390 528 L62 528 Z" fill="url(#box-face)" />
+        <path d="M62 150 L390 150 L390 528 L62 528 Z" fill={`url(#${faceId})`} />
 
         {/* The glass, large and confident */}
-        <g clipPath="url(#box-glass-inside)">
+        <g clipPath={`url(#${clipId})`}>
           <path
             d="M150 344 C182 330 208 352 232 342 C256 332 282 356 316 344 L316 420 L150 420 Z"
             fill={matcha}

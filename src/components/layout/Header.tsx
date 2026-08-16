@@ -166,7 +166,7 @@ export function Header() {
               className="u-label -mr-2 inline-flex h-11 items-center gap-2 px-2 font-semibold transition-opacity hover:opacity-70"
               aria-label={`Open cart, ${count} item${count === 1 ? "" : "s"}`}
             >
-              <span className="hidden sm:inline">Cart</span>
+              <span>Cart</span>
               <span className="tabular-nums">({count})</span>
             </button>
           </div>

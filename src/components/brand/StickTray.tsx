@@ -22,18 +22,26 @@ export function StickTray({
   className,
   count = brand.sticksPerBox,
   columns = 30,
+  mobileColumns = 15,
   tone,
 }: {
   className?: string;
   count?: number;
   columns?: number;
+  /** Columns below 640px — a 30-wide tray is unreadable on a phone. */
+  mobileColumns?: number;
   /** Forces one colourway — used when the tray sits on a green ground. */
   tone?: "green" | "ivory";
 }) {
   return (
     <div
-      className={cn("grid gap-1 sm:gap-1.5", className)}
-      style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+      className={cn("stick-tray grid gap-1 sm:gap-1.5", className)}
+      style={
+        {
+          "--tray-d": columns,
+          "--tray-m": mobileColumns,
+        } as React.CSSProperties
+      }
       role="img"
       aria-label={`${count} sticks of ${brand.servingWeight}${brand.servingUnit}, one serving each`}
     >

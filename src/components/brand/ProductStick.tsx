@@ -1,3 +1,6 @@
+"use client";
+
+import { useId } from "react";
 import { brand } from "@/data/brand";
 import { cn } from "@/lib/utils";
 import type { GlassVariant } from "./MatochaGlass";
@@ -149,7 +152,8 @@ export function ProductStick({
   glass?: GlassVariant;
 }) {
   const t = TONES[tone];
-  const uid = `${tone}-${glass}-${torn ? "t" : "s"}`;
+  /* Unique per instance — see the note in ProductBox. */
+  const uid = useId().replace(/:/g, "");
 
   return (
     <svg

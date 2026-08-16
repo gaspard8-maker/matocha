@@ -129,6 +129,18 @@
     scrollbar-width: none;
   }
 
+  /* The 30-stick tray needs fewer columns on a phone: at 30 across each pack
+     is ~10px wide and the row reads as a barcode. */
+  .stick-tray {
+    grid-template-columns: repeat(var(--tray-m), minmax(0, 1fr));
+  }
+
+  @media (min-width: 640px) {
+    .stick-tray {
+      grid-template-columns: repeat(var(--tray-d), minmax(0, 1fr));
+    }
+  }
+
   .marquee-track {
     animation: matocha-marquee var(--marquee-duration, 48s) linear infinite;
   }

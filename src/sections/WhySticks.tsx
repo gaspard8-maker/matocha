@@ -36,7 +36,7 @@ export function WhySticks() {
               className="group border-b border-black/15 pt-8 pb-10 sm:border-r sm:border-b-0 sm:border-black/15 sm:pr-7 sm:pl-7 sm:first:pl-0 sm:last:border-r-0"
             >
               <div className="flex items-center justify-between">
-                <span className="u-label opacity-45">{benefit.title}</span>
+                <span className="u-label opacity-45">{benefit.kicker}</span>
                 <span className="u-label tabular-nums opacity-30">
                   0{index + 1}
                 </span>
