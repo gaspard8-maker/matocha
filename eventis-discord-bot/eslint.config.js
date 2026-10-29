@@ -15,6 +15,7 @@ export default tseslint.config(
     rules: {
       "@typescript-eslint/restrict-template-expressions": ["error", { allowNumber: true }],
       "no-console": "error",
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     },
   },
   {
