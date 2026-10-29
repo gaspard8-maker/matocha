@@ -1,0 +1,11 @@
+# Facultatif : uniquement si le site Eventis doit envoyer des événements à ta VM.
+# Remplace bot.example.com par un sous-domaine pointant vers l'IP publique de ta VM.
+# Caddy obtient automatiquement le certificat HTTPS.
+bot.example.com {
+	handle /webhooks/eventis {
+		reverse_proxy 127.0.0.1:8787
+	}
+	handle {
+		respond 404
+	}
+}

@@ -1,0 +1,29 @@
+# Service systemd pour lancer Eventis Bot en continu sur ta VM.
+# Installation : voir docs/DEPLOYMENT.md
+[Unit]
+Description=Eventis Bot (Discord EventisPro)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=eventis
+Group=eventis
+WorkingDirectory=/opt/eventis-discord-bot
+ExecStart=/usr/bin/node --disable-warning=ExperimentalWarning dist/index.js
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+
+# Durcissement
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/eventis-discord-bot/data
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target
