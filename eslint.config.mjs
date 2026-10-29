@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Projet indépendant (bot Discord), avec sa propre configuration.
+    "eventis-discord-bot/**",
   ]),
 ]);
 
