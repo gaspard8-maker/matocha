@@ -45,7 +45,7 @@ export const envSchema = z
       (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
       z.string().min(32, "EVENTIS_WEBHOOK_SECRET_PREVIOUS doit contenir au moins 32 caractères.").optional(),
     ),
-    WEBHOOK_HOST: z.string().default("0.0.0.0"),
+    WEBHOOK_HOST: z.string().default("127.0.0.1"),
     WEBHOOK_PORT: z.coerce.number().int().min(1).max(65535).default(8787),
     WEBHOOK_TOLERANCE_SECONDS: z.coerce.number().int().min(30).max(900).default(300),
     WEBHOOK_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).max(10_000).default(60),

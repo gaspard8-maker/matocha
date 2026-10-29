@@ -11,7 +11,11 @@ Bot Discord officiel de la communauté **EventisPro**. Projet indépendant du si
 
 Aperçus (générés depuis le code, sans publication) : [`docs/previews/`](docs/previews/) — régénérables avec `npm run previews` (ouvre ensuite `previews/index.html`).
 
-## Démarrage rapide (sur ta VM)
+## Windows
+
+Double-clique sur **`start-windows.bat`** : il installe, configure et lance le bot dans une fenêtre de terminal. Détails : [`docs/WINDOWS.md`](docs/WINDOWS.md).
+
+## Démarrage rapide (Linux / ta VM)
 
 Prérequis : Node.js 22.13 ou plus récent (LTS 22 ou 24).
 
@@ -77,4 +81,5 @@ docs/            documentation
 - [Configuration Discord](docs/DISCORD_SETUP.md)
 - [Tickets](docs/TICKETS.md) · [Updates](docs/UPDATES.md) · [Sales-feed](docs/SALES_FEED.md) · [Bienvenue](docs/WELCOME.md)
 - [Intégration Eventis](docs/EVENTIS_INTEGRATION.md)
-- [Déploiement sur ta VM](docs/DEPLOYMENT.md)
+- [Lancer sur Windows](docs/WINDOWS.md)
+- [Déploiement sur ta VM Linux](docs/DEPLOYMENT.md)
