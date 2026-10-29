@@ -3,25 +3,11 @@ import { EventRepository } from "../src/persistence/event-repository.js";
 import { ReleaseHandler, parseRelease } from "../src/updates/release-handler.js";
 import { buildUpdateMessage, renderUpdateDescription } from "../src/updates/update-message.js";
 import { parseChangeLines, releaseFromForm, UpdateDrafts } from "../src/updates/update-interactions.js";
+import { sampleRelease } from "./fixtures.js";
 import { IDS, memoryDb, visibleText } from "./helpers.js";
 
 const LOGO = Buffer.from("logo");
 
-export function sampleRelease(overrides: Record<string, unknown> = {}) {
-  return {
-    release_id: "rel_2026_10_29_01",
-    version: "6.4.2",
-    environment: "production",
-    published_at: "2026-10-29T12:38:00+01:00",
-    changes: [
-      { category: "tickets", description: "Alertes de ventes : suivi de 10 événements." },
-      { category: "tickets", description: "Recherche dans les dossiers du stock." },
-      { category: "api", description: "Fix et améliorations générales de l'API." },
-      { category: "tickets", description: "Fix Multi Delisting." },
-    ],
-    ...overrides,
-  };
-}
 
 describe("embed de mise à jour (capture 2)", () => {
   it("reproduit la structure : titre UPDATE X.Y.Z, sections, puces, ligne vide entre sections", () => {

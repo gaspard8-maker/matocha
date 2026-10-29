@@ -49,6 +49,7 @@ export const envSchema = z
     WEBHOOK_PORT: z.coerce.number().int().min(1).max(65535).default(8787),
     WEBHOOK_TOLERANCE_SECONDS: z.coerce.number().int().min(30).max(900).default(300),
     WEBHOOK_RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).max(10_000).default(60),
+    WEBHOOK_TRUST_PROXY: booleanFlag(false),
 
     SALES_FEED_ENABLED: booleanFlag(false),
     EVENTIS_MARKETPLACE_URL: optionalHttpsUrl,
@@ -106,6 +107,7 @@ export interface AppConfig {
     secrets: string[];
     toleranceSeconds: number;
     rateLimitPerMinute: number;
+    trustProxy: boolean;
   };
   sales: { enabled: boolean; marketplaceUrl: string | undefined };
   updates: { showLogo: boolean };
@@ -157,6 +159,7 @@ export function parseConfig(source: NodeJS.ProcessEnv): AppConfig {
       ),
       toleranceSeconds: env.WEBHOOK_TOLERANCE_SECONDS,
       rateLimitPerMinute: env.WEBHOOK_RATE_LIMIT_PER_MINUTE,
+      trustProxy: env.WEBHOOK_TRUST_PROXY,
     },
     sales: { enabled: env.SALES_FEED_ENABLED, marketplaceUrl: env.EVENTIS_MARKETPLACE_URL },
     updates: { showLogo: env.UPDATES_SHOW_LOGO },

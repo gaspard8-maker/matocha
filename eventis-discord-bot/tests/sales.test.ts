@@ -2,28 +2,9 @@ import { describe, expect, it } from "vitest";
 import { SaleHandler } from "../src/sales/sale-handler.js";
 import { buildSaleMessage, formatPrice } from "../src/sales/sale-message.js";
 import { saleDataSchema, type SaleData } from "../src/sales/sale-schema.js";
+import { sampleSale } from "./fixtures.js";
 import { IDS, visibleText } from "./helpers.js";
 
-export function sampleSale(overrides: Record<string, unknown> = {}): Record<string, unknown> {
-  return {
-    sale_id: "sale_123",
-    livemode: true,
-    status: "confirmed",
-    payment_status: "succeeded",
-    channel: "marketplace",
-    confirmed_at: "2026-10-29T13:36:00+01:00",
-    event: {
-      name: "Celine Dion Nanterre",
-      starts_at: "2027-05-08T20:00:00+02:00",
-      venue: "Paris La Defense Arena",
-      image_url: "https://cdn.eventis.example/events/123.jpg",
-      url: "https://eventis.example/events/123",
-    },
-    tickets: { section: "105", row: "23", quantity: 2 },
-    price: { amount_minor: 110000, currency: "EUR" },
-    ...overrides,
-  };
-}
 
 const handler = new SaleHandler({ channelId: IDS.salesChannel, enabled: true, timeZone: "Europe/Paris" });
 
