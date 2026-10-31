@@ -38,9 +38,11 @@ export const envSchema = z
     DISCORD_SALES_CHANNEL_ID: snowflake("DISCORD_SALES_CHANNEL_ID"),
     DISCORD_WELCOME_CHANNEL_ID: snowflake("DISCORD_WELCOME_CHANNEL_ID"),
 
-    EVENTIS_WEBHOOK_SECRET: z
-      .string({ error: "EVENTIS_WEBHOOK_SECRET est manquant." })
-      .min(32, "EVENTIS_WEBHOOK_SECRET doit contenir au moins 32 caractères."),
+    // Facultatif : sans secret, l'API de réception des événements du site n'est pas démarrée.
+    EVENTIS_WEBHOOK_SECRET: z.preprocess(
+      (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+      z.string().min(32, "EVENTIS_WEBHOOK_SECRET doit contenir au moins 32 caractères.").optional(),
+    ),
     EVENTIS_WEBHOOK_SECRET_PREVIOUS: z.preprocess(
       (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
       z.string().min(32, "EVENTIS_WEBHOOK_SECRET_PREVIOUS doit contenir au moins 32 caractères.").optional(),

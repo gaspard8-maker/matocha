@@ -124,7 +124,7 @@ client.on(Events.Error, (error) => {
   logger.error({ err: error }, "erreur du client Discord");
 });
 
-const server = createWebhookServer({
+const server = config.webhook.secrets.length === 0 ? null : createWebhookServer({
   processor,
   secrets: config.webhook.secrets,
   toleranceSeconds: config.webhook.toleranceSeconds,
@@ -132,9 +132,13 @@ const server = createWebhookServer({
   trustProxy: config.webhook.trustProxy,
   logger,
 });
-server.listen(config.webhook.port, config.webhook.host, () => {
-  logger.info({ host: config.webhook.host, port: config.webhook.port }, "API d'intégration Eventis à l'écoute");
-});
+if (server) {
+  server.listen(config.webhook.port, config.webhook.host, () => {
+    logger.info({ host: config.webhook.host, port: config.webhook.port }, "API d'intégration Eventis à l'écoute");
+  });
+} else {
+  logger.info("EVENTIS_WEBHOOK_SECRET vide : réception des événements du site désactivée");
+}
 
 let stopping = false;
 async function shutdown(signal: string): Promise<void> {
@@ -142,7 +146,7 @@ async function shutdown(signal: string): Promise<void> {
   stopping = true;
   logger.info({ signal }, "arrêt en cours");
   processor.stop();
-  server.close();
+  server?.close();
   await client.destroy();
   db.close();
   process.exit(0);

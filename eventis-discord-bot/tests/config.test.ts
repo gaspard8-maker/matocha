@@ -22,8 +22,9 @@ describe("configuration", () => {
     expect(config.discord.owner).toEqual({ kind: "user", id: IDS.staff });
   });
 
-  it("exige un secret webhook suffisamment long", () => {
+  it("exige un secret webhook suffisamment long, mais permet de le laisser vide", () => {
     expect(() => parseConfig(testEnv({ EVENTIS_WEBHOOK_SECRET: "court" }))).toThrow(/32 caractères/);
+    expect(parseConfig(testEnv({ EVENTIS_WEBHOOK_SECRET: "" })).webhook.secrets).toEqual([]);
   });
 
   it("ne révèle jamais la valeur du token dans les erreurs", () => {
