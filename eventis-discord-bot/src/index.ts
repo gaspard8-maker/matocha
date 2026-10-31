@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { Events } from "discord.js";
+import { DiscordAPIError, Events } from "discord.js";
 import { ConfigError, parseConfig, type AppConfig } from "./config/env.js";
 import { loadDotEnv } from "./config/load-env.js";
 import { createLogger } from "./logging/logger.js";
@@ -95,6 +95,13 @@ client.once(Events.ClientReady, (ready) => {
       }
       await tickets.reconcile();
     } catch (error) {
+      if (error instanceof DiscordAPIError && error.code === 10004) {
+        process.stderr.write(
+          `\nServeur ${config.discord.guildId} introuvable pour le bot : invite-le sur ton serveur ` +
+            "(lien affiché par « npm run check-config ») et vérifie DISCORD_GUILD_ID " +
+            "(clic droit sur l'icône du serveur → Copier l'identifiant du serveur).\n\n",
+        );
+      }
       logger.error({ err: error }, "vérifications de démarrage incomplètes");
     }
     processor.start();
