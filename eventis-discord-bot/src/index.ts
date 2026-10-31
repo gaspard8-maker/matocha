@@ -158,6 +158,16 @@ process.on("unhandledRejection", (error) => {
 });
 
 client.login(config.discord.token).catch((error: unknown) => {
+  const message = error instanceof Error ? error.message : String(error);
+  if (/disallowed intents/i.test(message)) {
+    process.stderr.write(
+      "\nIntent manquant : active « Server Members Intent » dans le portail développeur Discord\n" +
+        "(https://discord.com/developers/applications → ton application → Bot → Privileged Gateway Intents),\n" +
+        "clique sur Save Changes, puis relance le bot.\n\n",
+    );
+  } else if (/invalid token|TokenInvalid/i.test(message)) {
+    process.stderr.write("\nToken refusé : régénère-le (portail → Bot → Reset Token) et colle-le dans .env.\n\n");
+  }
   logger.fatal({ err: error }, "connexion à Discord impossible (token ou intents)");
   process.exit(1);
 });
