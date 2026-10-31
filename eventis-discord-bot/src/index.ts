@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { DiscordAPIError, Events } from "discord.js";
+import { ChannelType, DiscordAPIError, Events } from "discord.js";
 import { ConfigError, parseConfig, type AppConfig } from "./config/env.js";
 import { loadDotEnv } from "./config/load-env.js";
 import { createLogger } from "./logging/logger.js";
@@ -12,6 +12,9 @@ import { openDatabase } from "./persistence/database.js";
 import { EventRepository } from "./persistence/event-repository.js";
 import { TicketRepository } from "./persistence/ticket-repository.js";
 import { WelcomeRepository } from "./persistence/welcome-repository.js";
+import { StateRepository } from "./persistence/state-repository.js";
+import { discordPanelChannel } from "./tickets/discord-panel-channel.js";
+import { ensureTicketPanel } from "./tickets/ticket-panel.js";
 import { EventProcessor } from "./integration/event-processor.js";
 import type { EventHandler } from "./integration/handler.js";
 import { createWebhookServer } from "./integration/webhook-server.js";
@@ -40,6 +43,7 @@ try {
 const logger = createLogger(config.logLevel);
 const db = openDatabase(config.databasePath);
 const eventsRepo = new EventRepository(db);
+const state = new StateRepository(db);
 const client = createDiscordClient();
 const publisher = new DiscordPublisher(client);
 const loadLogo = () => logoPng(256);
@@ -104,12 +108,23 @@ client.once(Events.ClientReady, (ready) => {
       }
       logger.error({ err: error }, "vérifications de démarrage incomplètes");
     }
+    // Publie (ou met à jour) automatiquement le message d'ouverture de ticket.
+    try {
+      const channel = await client.channels.fetch(config.discord.ticketChannelId);
+      if (channel?.type === ChannelType.GuildText) {
+        await ensureTicketPanel(discordPanelChannel(channel), ready.user.id, config.discord.owner, state, logger);
+      } else {
+        logger.error("salon des tickets introuvable : vérifie DISCORD_TICKET_CHANNEL_ID");
+      }
+    } catch (error) {
+      logger.error({ err: error }, "publication du message d'ouverture de ticket impossible (permissions du salon ?)");
+    }
     processor.start();
   })();
 });
 
 client.on(Events.InteractionCreate, (interaction) => {
-  void routeInteraction(interaction, { config, logger, tickets, updates: updateDeps, loadLogo });
+  void routeInteraction(interaction, { config, logger, tickets, updates: updateDeps, loadLogo, state });
 });
 
 client.on(Events.GuildMemberAdd, (member) => {

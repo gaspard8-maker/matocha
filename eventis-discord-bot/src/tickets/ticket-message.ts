@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, type APIEmbed } from "discord.js";
 import { BRAND_COLOR } from "../branding/brand.js";
 import type { OwnerTarget } from "../config/env.js";
 import type { OutboundMessage } from "../bot/outbound-message.js";
@@ -28,13 +28,30 @@ export function buildTicketMessage(memberId: string, owner: OwnerTarget): Outbou
   };
 }
 
-/** Panneau du salon 🎫・ouvrir-un-ticket : un seul bouton, aucun texte. */
-export function buildTicketPanelComponents(): ActionRowBuilder<ButtonBuilder>[] {
-  return [
-    new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder().setCustomId(OPEN_TICKET_BUTTON_ID).setLabel("Ouvrir un ticket").setStyle(ButtonStyle.Secondary),
-    ),
-  ];
+/** Panneau du salon 🎫・ouvrir-un-ticket (modèle fourni) : un embed et le bouton « Ouvrir un ticket ». */
+export function buildTicketPanel(owner: OwnerTarget): {
+  embeds: APIEmbed[];
+  components: ActionRowBuilder<ButtonBuilder>[];
+  allowedMentions: { parse: [] };
+} {
+  return {
+    embeds: [
+      {
+        title: "Ouvrir un ticket privé",
+        description:
+          `Une question ou besoin d’aide ? Ouvre un ticket pour échanger avec ${ownerMention(owner)}. ` +
+          "Si tu as déjà un ticket ouvert, tu y seras redirigé. " +
+          "Les paniers que tu réserves seront ajoutés à ce même ticket.",
+        color: BRAND_COLOR,
+      },
+    ],
+    components: [
+      new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder().setCustomId(OPEN_TICKET_BUTTON_ID).setLabel("Ouvrir un ticket").setStyle(ButtonStyle.Primary),
+      ),
+    ],
+    allowedMentions: { parse: [] },
+  };
 }
 
 export function ticketThreadName(ticketId: number): string {

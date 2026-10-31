@@ -11,7 +11,10 @@ import {
 import type { AppConfig } from "../config/env.js";
 import { isTicketStaff } from "../bot/access.js";
 import { missingPermissions, REQUIRED_CHANNEL_PERMISSIONS } from "../bot/permissions.js";
-import { buildTicketPanelComponents } from "./ticket-message.js";
+import type { Logger } from "../logging/logger.js";
+import type { StateRepository } from "../persistence/state-repository.js";
+import { discordPanelChannel } from "./discord-panel-channel.js";
+import { ensureTicketPanel } from "./ticket-panel.js";
 import type { OpenTicketResult, TicketService } from "./ticket-service.js";
 
 export const ticketCommand = new SlashCommandBuilder()
@@ -28,7 +31,7 @@ export const ticketCommand = new SlashCommandBuilder()
 
 export const ticketPanelCommand = new SlashCommandBuilder()
   .setName("ticket-panel")
-  .setDescription("Publier le bouton d'ouverture de ticket dans le salon des tickets")
+  .setDescription("Republier le message d'ouverture de ticket dans le salon des tickets")
   .setContexts(InteractionContextType.Guild)
   .setDefaultMemberPermissions(PermissionFlagsBits.Administrator);
 
@@ -103,7 +106,12 @@ export async function handleTicketCommand(
   await interaction.editReply({ content }).catch(() => undefined);
 }
 
-export async function handleTicketPanelCommand(interaction: ChatInputCommandInteraction, config: AppConfig): Promise<void> {
+export async function handleTicketPanelCommand(
+  interaction: ChatInputCommandInteraction,
+  config: AppConfig,
+  state: StateRepository,
+  logger: Logger,
+): Promise<void> {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
   const channel = await interaction.client.channels.fetch(config.discord.ticketChannelId).catch(() => null);
   if (channel?.type !== ChannelType.GuildText) {
@@ -116,6 +124,8 @@ export async function handleTicketPanelCommand(interaction: ChatInputCommandInte
     await interaction.editReply(`Permissions manquantes dans <#${channel.id}> : ${missing.join(", ")}.`);
     return;
   }
-  await channel.send({ components: buildTicketPanelComponents() });
-  await interaction.editReply(`Bouton publié dans <#${channel.id}>.`);
+  await ensureTicketPanel(discordPanelChannel(channel), interaction.client.user.id, config.discord.owner, state, logger, {
+    forceNew: true,
+  });
+  await interaction.editReply(`Message d'ouverture de ticket publié dans <#${channel.id}>.`);
 }

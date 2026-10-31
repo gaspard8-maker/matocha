@@ -7,7 +7,9 @@ import type { OutboundMessage } from "../src/bot/outbound-message.js";
 import { openDatabase } from "../src/persistence/database.js";
 import { TicketRepository } from "../src/persistence/ticket-repository.js";
 import { DiscordTicketGateway, NotPrivateThreadError, type TicketGateway, type ThreadState } from "../src/tickets/ticket-gateway.js";
-import { buildTicketMessage, buildTicketPanelComponents } from "../src/tickets/ticket-message.js";
+import { buildTicketMessage, buildTicketPanel } from "../src/tickets/ticket-message.js";
+import { ensureTicketPanel, PANEL_STATE_KEY, type PanelChannel, type PanelMessage } from "../src/tickets/ticket-panel.js";
+import { StateRepository } from "../src/persistence/state-repository.js";
 import { TicketService } from "../src/tickets/ticket-service.js";
 import { IDS, memoryDb, silentLogger, testConfig, visibleText } from "./helpers.js";
 
@@ -87,10 +89,23 @@ describe("message du ticket (capture 1)", () => {
     expect(message.allowedMentions).toEqual({ parse: [], users: [IDS.member] });
   });
 
-  it("le panneau ne contient qu'un bouton, sans texte", () => {
-    const rows = buildTicketPanelComponents().map((r) => r.toJSON());
+  it("le panneau reproduit le modèle : embed « Ouvrir un ticket privé » et bouton « Ouvrir un ticket »", () => {
+    const panel = buildTicketPanel({ kind: "role", id: IDS.ownerRole });
+    expect(panel.embeds).toEqual([
+      {
+        title: "Ouvrir un ticket privé",
+        description:
+          `Une question ou besoin d’aide ? Ouvre un ticket pour échanger avec <@&${IDS.ownerRole}>. ` +
+          "Si tu as déjà un ticket ouvert, tu y seras redirigé. Les paniers que tu réserves seront ajoutés à ce même ticket.",
+        color: 0x10b981,
+      },
+    ]);
+    const rows = panel.components.map((r) => r.toJSON());
     expect(rows).toHaveLength(1);
-    expect(rows[0]?.components).toHaveLength(1);
+    expect(rows[0]?.components).toEqual([
+      expect.objectContaining({ label: "Ouvrir un ticket", custom_id: "eventis:ticket:open", style: 1 }),
+    ]);
+    expect(panel.allowedMentions).toEqual({ parse: [] });
   });
 });
 
@@ -238,5 +253,66 @@ describe("DiscordTicketGateway", () => {
     const gateway = new DiscordTicketGateway(client as never, testConfig(), silentLogger);
     await expect(gateway.createPrivateThread("ticket-0002")).rejects.toBeInstanceOf(NotPrivateThreadError);
     expect(deleteThread).toHaveBeenCalled();
+  });
+});
+
+describe("publication automatique du panneau", () => {
+  const BOT = "400000000000000001";
+  function fakeChannel(initial: { id: string; authorId: string; button: boolean }[] = []) {
+    const messages = new Map<string, PanelMessage & { edits: number }>();
+    const add = (m: { id: string; authorId: string; button: boolean }) => {
+      const msg = {
+        id: m.id,
+        authorId: m.authorId,
+        hasOpenTicketButton: m.button,
+        edits: 0,
+        edit() {
+          msg.edits += 1;
+          return Promise.resolve();
+        },
+      };
+      messages.set(m.id, msg);
+    };
+    initial.forEach(add);
+    let next = 1;
+    const channel: PanelChannel = {
+      fetchMessage: (id) => Promise.resolve(messages.get(id) ?? null),
+      recentMessages: () => Promise.resolve([...messages.values()]),
+      send: () => {
+        const id = `50000000000000000${next++}`;
+        add({ id, authorId: BOT, button: true });
+        return Promise.resolve({ id });
+      },
+    };
+    return { channel, messages };
+  }
+  const owner = { kind: "role" as const, id: IDS.ownerRole };
+
+  it("publie le panneau au premier démarrage puis le met à jour sans doublon", async () => {
+    const state = new StateRepository(memoryDb());
+    const { channel, messages } = fakeChannel();
+    expect(await ensureTicketPanel(channel, BOT, owner, state, silentLogger)).toBe("created");
+    expect(await ensureTicketPanel(channel, BOT, owner, state, silentLogger)).toBe("updated");
+    expect(messages.size).toBe(1);
+    expect(state.get(PANEL_STATE_KEY)).toBe([...messages.keys()][0]);
+  });
+
+  it("retrouve un ancien panneau du bot, ignore ceux des autres", async () => {
+    const state = new StateRepository(memoryDb());
+    const { channel, messages } = fakeChannel([
+      { id: "600000000000000001", authorId: "999999999999999999", button: true },
+      { id: "600000000000000002", authorId: BOT, button: true },
+    ]);
+    expect(await ensureTicketPanel(channel, BOT, owner, state, silentLogger)).toBe("updated");
+    expect(state.get(PANEL_STATE_KEY)).toBe("600000000000000002");
+    expect(messages.size).toBe(2);
+  });
+
+  it("republie si le panneau a été supprimé", async () => {
+    const state = new StateRepository(memoryDb());
+    state.set(PANEL_STATE_KEY, "700000000000000001");
+    const { channel, messages } = fakeChannel();
+    expect(await ensureTicketPanel(channel, BOT, owner, state, silentLogger)).toBe("created");
+    expect(messages.size).toBe(1);
   });
 });

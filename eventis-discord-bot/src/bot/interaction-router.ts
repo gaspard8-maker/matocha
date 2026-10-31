@@ -9,6 +9,7 @@ import {
 } from "../tickets/ticket-interactions.js";
 import { OPEN_TICKET_BUTTON_ID } from "../tickets/ticket-message.js";
 import type { TicketService } from "../tickets/ticket-service.js";
+import type { StateRepository } from "../persistence/state-repository.js";
 import {
   handleUpdateAnnounceCommand,
   handleUpdateButton,
@@ -27,6 +28,7 @@ export interface RouterDeps {
   tickets: TicketService;
   updates: UpdateInteractionDeps;
   loadLogo: () => Promise<Buffer>;
+  state: StateRepository;
 }
 
 async function dispatch(interaction: Interaction, deps: RouterDeps): Promise<void> {
@@ -37,7 +39,7 @@ async function dispatch(interaction: Interaction, deps: RouterDeps): Promise<voi
       case "ticket":
         return handleTicketCommand(interaction, deps.tickets, deps.config);
       case "ticket-panel":
-        return handleTicketPanelCommand(interaction, deps.config);
+        return handleTicketPanelCommand(interaction, deps.config, deps.state, deps.logger);
       case "update-announce":
         return handleUpdateAnnounceCommand(interaction);
       case "sale-preview":

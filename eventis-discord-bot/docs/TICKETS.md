@@ -1,7 +1,14 @@
 # Tickets (capture 1)
 
 ## Fonctionnement
-1. Un admin lance `/ticket-panel` : le bot publie dans `🎫・ouvrir-un-ticket` un message contenant **uniquement** un bouton « Ouvrir un ticket ».
+1. **Au démarrage**, le bot publie automatiquement dans `🎫・ouvrir-un-ticket` le message d'ouverture (modèle fourni) :
+   ```
+   ┃ Ouvrir un ticket privé
+   ┃ Une question ou besoin d’aide ? Ouvre un ticket pour échanger avec @Owner. Si tu as déjà
+   ┃ un ticket ouvert, tu y seras redirigé. Les paniers que tu réserves seront ajoutés à ce même ticket.
+   [ Ouvrir un ticket ]
+   ```
+   S'il existe déjà, il est mis à jour (jamais en double) ; s'il a été supprimé, il est republié au prochain démarrage. `/ticket-panel` (admin) le republie immédiatement.
 2. Un membre clique. Le bot :
    - vérifie qu'il n'a pas déjà un ticket ouvert (sinon il reçoit, en privé, le lien du ticket existant, rouvert s'il était archivé) ;
    - applique un délai anti-spam (`TICKET_COOLDOWN_SECONDS`, 60 s par défaut) et ignore les doubles clics ;

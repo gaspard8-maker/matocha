@@ -37,7 +37,7 @@ Pour le faire tourner en continu sur la VM (redémarrage automatique) : [`docs/D
 
 | Commande | Qui | Effet |
 | --- | --- | --- |
-| `/ticket-panel` | Admin | Publie le bouton « Ouvrir un ticket » dans le salon des tickets |
+| `/ticket-panel` | Admin | Republie le message d'ouverture de ticket (publié automatiquement au démarrage) |
 | `/ticket close [raison]` | Auteur du ticket ou support | Ferme, verrouille et archive le fil (rien n'est supprimé) |
 | `/ticket claim` | Support | Prend le ticket en charge (historique interne) |
 | `/update-announce` | Admin | Formulaire → aperçu privé → bouton Publier/Annuler |
