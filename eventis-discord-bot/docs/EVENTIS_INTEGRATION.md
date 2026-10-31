@@ -67,6 +67,20 @@ Envoyé quand une vente Eventis Marketplace est confirmée et le paiement captur
 - `price.amount_minor` : prix de vente total de l'annonce en centimes (prix unitaire × quantité), hors frais.
 - **Interdit** (rejet 422) : toute donnée acheteur/vendeur, prix d'achat, valeur faciale, marge, ROI, données de paiement, numéros de billets, QR codes.
 
+### `member.pro.updated`
+Envoyé quand un compte Eventis **relié à Discord** passe Pro ou cesse de l'être. Le bot ajoute ou retire `DISCORD_PRO_ROLE_ID`.
+```json
+{
+  "change_id": "chg_01JC…",
+  "discord_user_id": "123456789012345678",
+  "is_pro": true,
+  "changed_at": "2026-11-01T10:00:00Z"
+}
+```
+- **Prérequis côté site** : un bouton « Connecter Discord » (OAuth2 Discord, scope `identify`) qui enregistre l'identifiant Discord du compte. Sans lui, le site ne sait pas à qui donner le rôle.
+- Un changement plus ancien que le dernier appliqué est ignoré (livraison dans le désordre).
+- Membre absent du serveur : rien n'est fait.
+
 ## Réponses du bot
 | Code | Corps | Signification |
 | --- | --- | --- |
@@ -94,7 +108,8 @@ npm run sign-event -- /tmp/event.json
 > 2. Ventes : appelle `marketplace.sale.confirmed` uniquement après confirmation définitive d'une vente Marketplace avec paiement capturé (webhook du prestataire de paiement, après mise à jour de la base, de façon idempotente). `livemode` = vrai uniquement en mode de paiement réel. N'envoie que les champs du contrat ; aucune donnée personnelle ni financière privée. Les ventes externes déclarées manuellement ont `channel: "external_manual"` ou ne sont pas envoyées.
 > 3. Mises à jour : appelle `site.release.published` une seule fois quand une version est réellement en production (étape de fin de déploiement ou action admin « Publier la version »), avec un `release_id` stable, la version X.Y.Z et la liste des modifications publiques (`tickets` / `api`). Jamais sur un commit, un build preview ou en local.
 > 4. Ajoute les variables à `.env.example` sans valeur. Ajoute des tests : signature correcte, aucune donnée privée dans le corps, pas d'envoi en sandbox.
-> 5. Ne modifie rien d'autre.
+> 5. Rôle Pro : ajoute dans le compte utilisateur un bouton « Connecter Discord » (OAuth2 Discord, scope `identify`, state anti-CSRF) qui enregistre l'identifiant Discord du compte, avec possibilité de le délier. Quand l'abonnement Pro d'un compte relié commence ou se termine, envoie `member.pro.updated` (`change_id` unique, `discord_user_id`, `is_pro`, `changed_at`). N'envoie aucune autre donnée.
+> 6. Ne modifie rien d'autre.
 
 Exemple de signature (Node.js) :
 ```ts

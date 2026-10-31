@@ -26,6 +26,9 @@ import { RELEASE_EVENT_TYPE, ReleaseHandler } from "./updates/release-handler.js
 import { UpdateDrafts } from "./updates/update-interactions.js";
 import { fetchAvatar, renderWelcomeBanner } from "./welcome/banner.js";
 import { WelcomeService } from "./welcome/welcome-service.js";
+import { DiscordRoleGateway } from "./roles/role-gateway.js";
+import { ProRoleHandler } from "./roles/pro-handler.js";
+import { assignJoinRole } from "./roles/join-role.js";
 
 loadDotEnv();
 
@@ -47,6 +50,7 @@ const state = new StateRepository(db);
 const client = createDiscordClient();
 const publisher = new DiscordPublisher(client);
 const loadLogo = () => logoPng(256);
+const roles = new DiscordRoleGateway(client, config.discord.guildId);
 
 const processor = new EventProcessor(
   eventsRepo,
@@ -58,6 +62,7 @@ const processor = new EventProcessor(
       timeZone: config.timezone,
       marketplaceUrl: config.sales.marketplaceUrl,
     }),
+    new ProRoleHandler(config.discord.proRoleId, roles, state),
   ] as EventHandler<unknown>[],
   publisher,
   logger,
@@ -129,6 +134,7 @@ client.on(Events.InteractionCreate, (interaction) => {
 
 client.on(Events.GuildMemberAdd, (member) => {
   if (member.guild.id !== config.discord.guildId) return;
+  void assignJoinRole({ userId: member.id, isBot: member.user.bot }, config.discord.memberRoleId, roles, logger);
   void welcome.handleMemberJoin({
     guildId: member.guild.id,
     userId: member.id,

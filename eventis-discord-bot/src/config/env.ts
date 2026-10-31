@@ -34,6 +34,8 @@ export const envSchema = z
     DISCORD_OWNER_ROLE_ID: optionalSnowflake("DISCORD_OWNER_ROLE_ID"),
     DISCORD_OWNER_USER_ID: optionalSnowflake("DISCORD_OWNER_USER_ID"),
     DISCORD_SUPPORT_ROLE_ID: optionalSnowflake("DISCORD_SUPPORT_ROLE_ID"),
+    DISCORD_MEMBER_ROLE_ID: optionalSnowflake("DISCORD_MEMBER_ROLE_ID"),
+    DISCORD_PRO_ROLE_ID: optionalSnowflake("DISCORD_PRO_ROLE_ID"),
     DISCORD_UPDATES_CHANNEL_ID: snowflake("DISCORD_UPDATES_CHANNEL_ID"),
     DISCORD_SALES_CHANNEL_ID: snowflake("DISCORD_SALES_CHANNEL_ID"),
     DISCORD_WELCOME_CHANNEL_ID: snowflake("DISCORD_WELCOME_CHANNEL_ID"),
@@ -99,6 +101,8 @@ export interface AppConfig {
     ticketChannelId: string;
     owner: OwnerTarget;
     supportRoleId: string | undefined;
+    memberRoleId: string | undefined;
+    proRoleId: string | undefined;
     updatesChannelId: string;
     salesChannelId: string;
     welcomeChannelId: string;
@@ -149,6 +153,8 @@ export function parseConfig(source: NodeJS.ProcessEnv): AppConfig {
       ticketChannelId: env.DISCORD_TICKET_CHANNEL_ID,
       owner,
       supportRoleId: env.DISCORD_SUPPORT_ROLE_ID,
+      memberRoleId: env.DISCORD_MEMBER_ROLE_ID,
+      proRoleId: env.DISCORD_PRO_ROLE_ID,
       updatesChannelId: env.DISCORD_UPDATES_CHANNEL_ID,
       salesChannelId: env.DISCORD_SALES_CHANNEL_ID,
       welcomeChannelId: env.DISCORD_WELCOME_CHANNEL_ID,

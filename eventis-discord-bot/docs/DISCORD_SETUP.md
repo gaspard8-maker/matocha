@@ -20,6 +20,8 @@ Discord → Paramètres utilisateur → Avancés → **Mode développeur** activ
 | `DISCORD_WELCOME_CHANNEL_ID` | `arrivant` |
 | `DISCORD_OWNER_ROLE_ID` **ou** `DISCORD_OWNER_USER_ID` | Rôle `@Owner` (Paramètres du serveur → Rôles) ou ton profil |
 | `DISCORD_SUPPORT_ROLE_ID` | Rôle support (facultatif) |
+| `DISCORD_MEMBER_ROLE_ID` | Rôle donné à chaque arrivant (facultatif) |
+| `DISCORD_PRO_ROLE_ID` | Rôle Pro, piloté par le site (facultatif) |
 
 Le bot refuse de démarrer si un identifiant est absent ou mal formé : rien n'est deviné.
 
@@ -28,6 +30,7 @@ Le bot refuse de démarrer si un identifiant est absent ou mal formé : rien n'e
 
 - Voir les salons, Envoyer des messages, Intégrer des liens, Joindre des fichiers, Voir les anciens messages
 - Créer des fils privés, Envoyer des messages dans les fils, Gérer les fils
+- Gérer les rôles (rôles Membre et Pro)
 - Scope `applications.commands` (commandes slash)
 
 ## 4. Permissions par salon
@@ -46,7 +49,12 @@ Dans le salon des tickets, retire aux membres la permission **Créer des fils pu
 - `@Owner` est mentionné dans l'embed du ticket (sans notification). Le rôle (ou l'utilisateur) et le rôle Support sont **ajoutés au fil** à chaque création (jusqu'à `TICKET_MAX_STAFF_ADDED` personnes).
 - Discord : toute personne ayant **Gérer les fils** sur le salon (et les administrateurs) peut voir tous les fils privés. Donne cette permission au rôle Support sur le salon des tickets pour qu'il voie aussi les anciens tickets.
 
-## 6. Vérifier
+## 6. Rôles Membre et Pro
+Pour attribuer un rôle, le bot doit avoir **Gérer les rôles** et son propre rôle doit être **placé au-dessus** des rôles Membre et Pro : Paramètres du serveur → Rôles → fais glisser le rôle du bot plus haut dans la liste. Il ne peut jamais attribuer un rôle situé au-dessus du sien.
+
+Si le bot a été invité avant l'ajout de cette fonction, donne-lui « Gérer les rôles » dans Paramètres du serveur → Rôles → rôle du bot, ou réinvite-le avec le lien de `npm run check-config`.
+
+## 7. Vérifier
 ```bash
 npm run check-config -- --discord
 ```

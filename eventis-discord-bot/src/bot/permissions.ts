@@ -21,9 +21,11 @@ export const REQUIRED_CHANNEL_PERMISSIONS: Record<ChannelRole, bigint[]> = {
 };
 
 /** Permissions à cocher lors de l'invitation du bot (union de tous les salons). */
-export const INVITE_PERMISSIONS = new PermissionsBitField(
-  Object.values(REQUIRED_CHANNEL_PERMISSIONS).flat(),
-);
+export const INVITE_PERMISSIONS = new PermissionsBitField([
+  ...Object.values(REQUIRED_CHANNEL_PERMISSIONS).flat(),
+  // Attribution des rôles Membre et Pro.
+  P.ManageRoles,
+]);
 
 const FRENCH_NAMES: Record<string, string> = {
   ViewChannel: "Voir le salon",
@@ -34,6 +36,7 @@ const FRENCH_NAMES: Record<string, string> = {
   CreatePrivateThreads: "Créer des fils privés",
   SendMessagesInThreads: "Envoyer des messages dans les fils",
   ManageThreads: "Gérer les fils",
+  ManageRoles: "Gérer les rôles",
 };
 
 export function permissionLabel(flag: bigint): string {

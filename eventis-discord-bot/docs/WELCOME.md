@@ -16,6 +16,9 @@ Exactement les deux lignes et la bannière, dans un seul message. La mention au-
 - Avatar absent ou CDN indisponible : bannière avec un cercle vide (aucune erreur visible).
 - Les avatars ne sont téléchargés que depuis le CDN Discord.
 
+## Rôle Membre
+Si `DISCORD_MEMBER_ROLE_ID` est renseigné, chaque nouvel arrivant (hors bots) reçoit ce rôle. Un échec (permission, hiérarchie) est journalisé sans bloquer le message de bienvenue.
+
 ## Fiabilité
 - Une arrivée = un message (clé serveur + membre + date d'arrivée en base) ; aucun envoi au redémarrage (Discord ne rejoue pas les arrivées).
 - Bots ignorés ; un membre qui revient dans les `WELCOME_REJOIN_COOLDOWN_HOURS` (24 h) n'est pas re-salué.

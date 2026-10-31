@@ -102,9 +102,10 @@ export class EventProcessor {
       return { status: "ignored", reason: prepared.ignore };
     }
     try {
-      const messageId = await this.publisher.send(prepared.channelId, prepared.message, {
-        nonce: nonceFor(event.dedupeKey),
-      });
+      const messageId =
+        "run" in prepared
+          ? await prepared.run()
+          : await this.publisher.send(prepared.channelId, prepared.message, { nonce: nonceFor(event.dedupeKey) });
       this.repo.markPublished(event.dedupeKey, messageId, this.now());
       this.logger.info({ dedupeKey: event.dedupeKey, messageId }, "événement publié sur Discord");
       return { status: "published", messageId };

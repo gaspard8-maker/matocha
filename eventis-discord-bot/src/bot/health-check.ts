@@ -50,6 +50,19 @@ export async function checkChannels(client: Client, config: AppConfig): Promise<
   if (config.discord.owner.kind === "role" && !(await guild.roles.fetch(config.discord.owner.id).catch(() => null))) {
     results.push({ role: "tickets", channelId: "-", channelName: "Rôle Owner", ok: false, problems: ["Rôle Owner introuvable."] });
   }
+  for (const [label, roleId] of [
+    ["Rôle Membre", config.discord.memberRoleId],
+    ["Rôle Pro", config.discord.proRoleId],
+  ] as const) {
+    if (!roleId) continue;
+    const role = await guild.roles.fetch(roleId).catch(() => null);
+    const problems = !role
+      ? ["Rôle introuvable."]
+      : role.editable
+        ? []
+        : ["Le bot ne peut pas l'attribuer : donne-lui « Gérer les rôles » et place son rôle au-dessus de celui-ci."];
+    results.push({ role: "welcome", channelId: roleId, channelName: label, ok: problems.length === 0, problems });
+  }
   if (config.discord.supportRoleId && !(await guild.roles.fetch(config.discord.supportRoleId).catch(() => null))) {
     results.push({ role: "tickets", channelId: "-", channelName: "Rôle Support", ok: false, problems: ["Rôle Support introuvable."] });
   }
@@ -59,7 +72,10 @@ export async function checkChannels(client: Client, config: AppConfig): Promise<
 export function formatChannelChecks(checks: ChannelCheck[]): string {
   return checks
     .map((c) => {
-      const head = `${c.ok ? "✅" : "❌"} ${ROLE_LABELS[c.role]} — ${c.channelName ? `#${c.channelName}` : c.channelId}`;
+      const target = c.channelName?.startsWith("Rôle ")
+        ? c.channelName
+        : `${ROLE_LABELS[c.role]} — ${c.channelName ? `#${c.channelName}` : c.channelId}`;
+      const head = `${c.ok ? "✅" : "❌"} ${target}`;
       return c.ok ? head : [head, ...c.problems.map((p) => `   • ${p}`)].join("\n");
     })
     .join("\n");

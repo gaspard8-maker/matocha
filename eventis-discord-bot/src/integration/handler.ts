@@ -1,6 +1,10 @@
 import type { OutboundMessage } from "../bot/outbound-message.js";
 
-export type PreparedPublication = { channelId: string; message: OutboundMessage } | { ignore: string };
+export type PreparedPublication =
+  | { channelId: string; message: OutboundMessage }
+  | { ignore: string }
+  /** Action Discord autre qu'un message (ex. rôle) ; retourne une référence pour l'historique. */
+  | { run: () => Promise<string> };
 
 /** Traitement d'un type d'événement Eventis (validation, idempotence, rendu). */
 export interface EventHandler<T> {
