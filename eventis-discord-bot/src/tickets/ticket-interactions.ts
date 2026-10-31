@@ -54,7 +54,11 @@ export function openResultReply(result: OpenTicketResult): string {
 
 export async function handleOpenTicketButton(interaction: ButtonInteraction, service: TicketService): Promise<void> {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-  const result = await service.open(interaction.user.id);
+  const member = (interaction.member ?? null) as GuildMember | null;
+  const result = await service.open(interaction.user.id, {
+    displayName: member?.displayName ?? interaction.user.displayName,
+    username: interaction.user.username,
+  });
   await interaction.editReply({ content: openResultReply(result), allowedMentions: { parse: [] } });
 }
 

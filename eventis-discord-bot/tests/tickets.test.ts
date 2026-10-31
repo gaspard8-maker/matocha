@@ -7,7 +7,7 @@ import type { OutboundMessage } from "../src/bot/outbound-message.js";
 import { openDatabase } from "../src/persistence/database.js";
 import { TicketRepository } from "../src/persistence/ticket-repository.js";
 import { DiscordTicketGateway, NotPrivateThreadError, type TicketGateway, type ThreadState } from "../src/tickets/ticket-gateway.js";
-import { buildTicketMessage, buildTicketPanel } from "../src/tickets/ticket-message.js";
+import { buildTicketMessage, buildTicketPanel, ticketThreadName } from "../src/tickets/ticket-message.js";
 import { ensureTicketPanel, PANEL_STATE_KEY, type PanelChannel, type PanelMessage } from "../src/tickets/ticket-panel.js";
 import { StateRepository } from "../src/persistence/state-repository.js";
 import { TicketService } from "../src/tickets/ticket-service.js";
@@ -23,7 +23,9 @@ class FakeGateway implements TicketGateway {
   missingPermissions() {
     return Promise.resolve(this.missing);
   }
-  createPrivateThread(_name: string) {
+  names: string[] = [];
+  createPrivateThread(name: string) {
+    this.names.push(name);
     const id = `30000000000000000${this.next++}`;
     this.threads.set(id, { state: "active", members: [], messages: [], private: true });
     return Promise.resolve(id);
@@ -106,6 +108,21 @@ describe("message du ticket (capture 1)", () => {
       expect.objectContaining({ label: "Ouvrir un ticket", custom_id: "eventis:ticket:open", style: 1 }),
     ]);
     expect(panel.allowedMentions).toEqual({ parse: [] });
+  });
+});
+
+describe("nom du fil", () => {
+  it("affiche « pseudo · @compte »", () => {
+    expect(ticketThreadName({ displayName: "mlab", username: "mlab07" }, 1)).toBe("mlab · @mlab07");
+    expect(ticketThreadName({ displayName: "  ", username: "mlab07" }, 1)).toBe("mlab07 · @mlab07");
+    expect(ticketThreadName(undefined, 12)).toBe("ticket-0012");
+    expect(ticketThreadName({ displayName: "x".repeat(150), username: "a" }, 1)).toHaveLength(100);
+  });
+
+  it("le service nomme le fil avec le pseudo et le compte du membre", async () => {
+    const { service, gateway } = setup();
+    await service.open(IDS.member, { displayName: "mlab", username: "mlab07" });
+    expect(gateway.names).toEqual(["mlab · @mlab07"]);
   });
 });
 

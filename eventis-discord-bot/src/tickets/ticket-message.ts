@@ -54,6 +54,16 @@ export function buildTicketPanel(owner: OwnerTarget): {
   };
 }
 
-export function ticketThreadName(ticketId: number): string {
-  return `ticket-${String(ticketId).padStart(4, "0")}`;
+export interface TicketOwnerNames {
+  displayName: string;
+  username: string;
+}
+
+/** Nom du fil : « pseudo · @compte » (100 caractères max, limite Discord). */
+export function ticketThreadName(names: TicketOwnerNames | undefined, ticketId: number): string {
+  const clean = (v: string) => v.replace(/\s+/g, " ").trim();
+  const username = clean(names?.username ?? "");
+  if (!username) return `ticket-${String(ticketId).padStart(4, "0")}`;
+  const displayName = clean(names?.displayName ?? "") || username;
+  return `${displayName} · @${username}`.slice(0, 100);
 }

@@ -1,7 +1,7 @@
 import type { OwnerTarget } from "../config/env.js";
 import type { Logger } from "../logging/logger.js";
 import type { Ticket, TicketRepository } from "../persistence/ticket-repository.js";
-import { buildTicketMessage, ticketThreadName } from "./ticket-message.js";
+import { buildTicketMessage, ticketThreadName, type TicketOwnerNames } from "./ticket-message.js";
 import type { TicketGateway } from "./ticket-gateway.js";
 
 export type OpenTicketResult =
@@ -46,11 +46,11 @@ export class TicketService {
     this.now = options.now ?? (() => new Date());
   }
 
-  async open(userId: string): Promise<OpenTicketResult> {
+  async open(userId: string, names?: TicketOwnerNames): Promise<OpenTicketResult> {
     if (this.inFlight.has(userId)) return { kind: "busy" };
     this.inFlight.add(userId);
     try {
-      return await this.openUnlocked(userId);
+      return await this.openUnlocked(userId, names);
     } catch (error) {
       this.logger.error({ err: error, userId }, "ouverture de ticket impossible");
       return { kind: "error" };
@@ -59,7 +59,7 @@ export class TicketService {
     }
   }
 
-  private async openUnlocked(userId: string): Promise<OpenTicketResult> {
+  private async openUnlocked(userId: string, names: TicketOwnerNames | undefined): Promise<OpenTicketResult> {
     const { guildId } = this.options;
     const active = this.repo.findActiveForMember(guildId, userId);
     if (active) {
@@ -90,7 +90,7 @@ export class TicketService {
 
     let threadId: string;
     try {
-      threadId = await this.gateway.createPrivateThread(ticketThreadName(ticket.id));
+      threadId = await this.gateway.createPrivateThread(ticketThreadName(names, ticket.id));
     } catch (error) {
       this.repo.close(ticket.id, null, "creation_failed", this.now());
       throw error;

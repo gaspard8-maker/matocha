@@ -13,7 +13,7 @@
    - vérifie qu'il n'a pas déjà un ticket ouvert (sinon il reçoit, en privé, le lien du ticket existant, rouvert s'il était archivé) ;
    - applique un délai anti-spam (`TICKET_COOLDOWN_SECONDS`, 60 s par défaut) et ignore les doubles clics ;
    - vérifie ses permissions **avant** de créer quoi que ce soit (sinon : message d'erreur, aucun fil) ;
-   - crée un **fil privé** non invitable dans le salon existant — jamais un salon, jamais un fil public (si Discord renvoyait un autre type, le fil est supprimé et le ticket refusé) ;
+   - crée un **fil privé** non invitable dans le salon existant, nommé « pseudo · @compte » (ex. `mlab · @mlab07`) — jamais un salon, jamais un fil public (si Discord renvoyait un autre type, le fil est supprimé et le ticket refusé) ;
    - envoie le message de la capture 1, ajoute le membre puis l'équipe (Owner + Support) ;
    - enregistre le ticket en base.
 
